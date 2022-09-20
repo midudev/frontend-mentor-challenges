@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout>
+	<main class="min-h-screen grid place-content-center">
+		<div class="bg-white rounded-2xl w-80 p-4 flex flex-col gap-4">
+			<div id="result" class="bg-[#3685FF] rounded-lg overflow-hidden p-4">
+				
+			</div>
+			<form id="qr-code-form">
+				<label class="font-bold text-sm text-left">
+					<span class="block pb-1">Introduce URL para crear código QR:</span>
+				<input name="url" class="w-full font-normal border-2 px-4 py-2 rounded-full" type="url" placeholder="https://..." />
+				<span class="text-xs text-red-500" id="url-error"></span>
+			</label>
+			</form>
+			<p class="text-xs text-center text-gray-500 px-8">Esto lo hemos hecho en directo en midudev</p>
+		</div>
+	</main>
+</Layout>
+
+<script>
+	const form = document.querySelector('#qr-code-form')
+	const result = document.querySelector('#result')
+
+	form.addEventListener('submit', (evt) => {
+		evt.preventDefault()
+
+		const url = new URL(evt.target[0].value)
+
+		fetch('http://127.0.0.1:8788/api/generate-qr', {
+			method: 'POST',
+			body: JSON.stringify({ url: url.toString() }),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				const { svg } = data
+				result.innerHTML = svg
+			})
+	})
+</script>
